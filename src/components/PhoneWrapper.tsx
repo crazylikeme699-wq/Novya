@@ -26,10 +26,10 @@ export function PhoneWrapper() {
   }, []);
 
   return (
-    <div className={`relative w-full max-w-[380px] h-[800px] ${theme} bg-white dark:bg-black rounded-[50px] border-[14px] border-neutral-300 dark:border-neutral-800 shadow-2xl overflow-hidden shadow-black/50 ring-1 ring-black/10 dark:ring-white/10 flex flex-col font-sans transition-colors duration-300`}>
+    <div className={`relative w-full h-dvh sm:h-[800px] sm:max-w-[380px] ${theme} bg-white dark:bg-black sm:rounded-[50px] sm:border-[14px] border-neutral-300 dark:border-neutral-800 sm:shadow-2xl overflow-hidden sm:shadow-black/50 sm:ring-1 ring-black/10 dark:ring-white/10 flex flex-col font-sans transition-colors duration-300`}>
       
       {/* Status Bar */}
-      <div className="absolute top-0 w-full h-[40px] px-6 flex justify-between items-center z-50 text-black dark:text-white text-xs font-medium transition-colors duration-300">
+      <div className="absolute top-0 w-full h-[40px] px-6 hidden sm:flex justify-between items-center z-50 text-black dark:text-white text-xs font-medium transition-colors duration-300">
         <span>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         
         {/* Notch */}
@@ -43,7 +43,7 @@ export function PhoneWrapper() {
       </div>
 
       {/* Screen Content */}
-      <div className="flex-1 w-full h-full pt-[40px] relative bg-white dark:bg-black transition-colors duration-300">
+      <div className="flex-1 w-full h-full sm:pt-[40px] relative bg-white dark:bg-black transition-colors duration-300">
         <AnimatePresence mode="wait">
           {currentScreen === 'splash' && (
              <motion.div key="splash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(10px)', scale: 1.1 }} transition={{ duration: 0.5 }} className="absolute inset-0 z-50 bg-black">
