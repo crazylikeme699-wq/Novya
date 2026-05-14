@@ -15,6 +15,10 @@ export function AlarmScreen({ onNavigate }: { onNavigate: (screen: ScreenType) =
   const [newLabel, setNewLabel] = useState('Wake Up');
   const [ringingAlarmId, setRingingAlarmId] = useState<string | null>(null);
 
+  const [showTaskPrompt, setShowTaskPrompt] = useState(false);
+  const [morningTask, setMorningTask] = useState('');
+  const addTask = useStore((state) => state.addTask);
+
   // Play alarm sound if an alarm matches current time and is enabled
   useEffect(() => {
     const checkAlarms = () => {
@@ -102,6 +106,20 @@ export function AlarmScreen({ onNavigate }: { onNavigate: (screen: ScreenType) =
 
   const handleStopRinging = () => {
     setRingingAlarmId(null);
+    setShowTaskPrompt(true);
+  };
+
+  const handleSaveMorningTask = () => {
+    if (morningTask.trim()) {
+      addTask({ title: morningTask.trim(), tags: ['morning'] });
+    }
+    setShowTaskPrompt(false);
+    setMorningTask('');
+  };
+
+  const handleSkipMorningTask = () => {
+    setShowTaskPrompt(false);
+    setMorningTask('');
   };
 
   // Sort alarms by time
@@ -228,6 +246,55 @@ export function AlarmScreen({ onNavigate }: { onNavigate: (screen: ScreenType) =
                 <BellOff className="w-5 h-5" />
                 Stop
               </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Task Prompt Overlay */}
+      <AnimatePresence>
+        {showTaskPrompt && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="absolute inset-0 z-[100] bg-white dark:bg-black p-6 flex flex-col items-center justify-center transition-colors duration-300"
+          >
+            <div className="w-full max-w-sm">
+              <h2 className="text-3xl font-light tracking-tighter text-black dark:text-white mb-2 text-center">
+                Good morning!
+              </h2>
+              <p className="text-neutral-500 dark:text-neutral-400 font-medium mb-8 text-center text-sm">
+                What's your most important task for today?
+              </p>
+
+              <input
+                type="text"
+                value={morningTask}
+                onChange={(e) => setMorningTask(e.target.value)}
+                placeholder="e.g., Finish project presentation"
+                className="w-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl px-4 py-4 text-black dark:text-white placeholder:text-neutral-400 focus:outline-none focus:border-orange-500 transition-colors mb-6"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveMorningTask();
+                }}
+              />
+
+              <div className="flex flex-col gap-3">
+                <button 
+                  onClick={handleSaveMorningTask}
+                  disabled={!morningTask.trim()}
+                  className="w-full bg-orange-500 text-white py-4 rounded-xl font-bold tracking-wide hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:grayscale"
+                >
+                  Save Task
+                </button>
+                <button 
+                  onClick={handleSkipMorningTask}
+                  className="w-full text-neutral-500 dark:text-neutral-400 py-3 font-medium hover:text-black dark:hover:text-white transition-colors"
+                >
+                  Skip for now
+                </button>
+              </div>
             </div>
           </motion.div>
         )}
