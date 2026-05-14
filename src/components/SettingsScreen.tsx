@@ -1,11 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { useStore } from '../store';
 import { ScreenType } from './PhoneWrapper';
-import { ChevronLeft, Moon, Sun, ImagePlus } from 'lucide-react';
+import { ChevronLeft, Moon, Sun, ImagePlus, LogOut } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function SettingsScreen({ onNavigate }: { onNavigate: (screen: ScreenType) => void }) {
-  const { theme, setTheme, username, setUsername, profilePicture, setProfilePicture } = useStore();
+  const { theme, setTheme, username, setUsername, profilePicture, setProfilePicture, logout } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -85,7 +87,59 @@ export function SettingsScreen({ onNavigate }: { onNavigate: (screen: ScreenType
               </button>
             </div>
          </div>
+
+         {/* Logout Button */}
+         <div className="mt-8">
+            <button 
+              onClick={() => setShowLogoutConfirm(true)}
+              className="w-full bg-rose-50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 py-4 rounded-2xl font-bold tracking-wide flex items-center justify-center gap-2 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors border border-rose-100 dark:border-rose-900/50"
+            >
+              <LogOut className="w-5 h-5" />
+              Log out
+            </button>
+         </div>
       </div>
+
+      {/* Logout Confirmation Overlay */}
+      <AnimatePresence>
+        {showLogoutConfirm && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              className="bg-white dark:bg-neutral-900 w-full max-w-sm rounded-3xl p-8 flex flex-col items-center text-center shadow-2xl border border-neutral-200 dark:border-neutral-800"
+            >
+              <h2 className="text-2xl font-bold text-black dark:text-white mb-4 leading-tight">
+                Have you given up? Are you that weak?
+              </h2>
+              
+              <div className="flex w-full gap-4 mt-8">
+                <button 
+                  onClick={() => setShowLogoutConfirm(false)}
+                  className="flex-1 py-3 rounded-xl font-bold text-neutral-600 dark:text-neutral-400 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  No
+                </button>
+                <button 
+                  onClick={() => {
+                    logout();
+                    onNavigate('splash');
+                  }}
+                  className="flex-1 py-3 rounded-xl font-bold text-white bg-rose-600 hover:bg-rose-700 transition-colors shadow-lg shadow-rose-600/20"
+                >
+                  Yes
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

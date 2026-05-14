@@ -76,6 +76,7 @@ export interface NovyaState {
   addAlarm: (time: string, label: string) => void;
   toggleAlarm: (id: string) => void;
   deleteAlarm: (id: string) => void;
+  logout: () => void;
 }
 
 const defaultApps: AppIcon[] = [
@@ -225,6 +226,27 @@ export const useStore = create<NovyaState>()(
         })),
 
       setProfile: (profile) => set({ profile }),
+
+      logout: () =>
+        set(() => ({
+          alarms: [],
+          tasks: [],
+          notes: [],
+          stats: {
+             xp: 0,
+             level: 1,
+             streak: 0,
+          },
+          focusSession: {
+             active: false,
+             endTime: null,
+             blockedApps: [],
+          },
+          profile: 'personal',
+          username: '',
+          profilePicture: null,
+          hasCompletedSetup: false,
+        })),
     }),
     {
       name: 'novya-storage',
