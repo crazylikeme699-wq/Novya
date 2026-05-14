@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../store';
 import { ScreenType } from './PhoneWrapper';
-import { ChevronLeft, Moon, Sun } from 'lucide-react';
+import { ChevronLeft, Moon, Sun, ImagePlus } from 'lucide-react';
 
 export function SettingsScreen({ onNavigate }: { onNavigate: (screen: ScreenType) => void }) {
-  const { theme, setTheme } = useStore();
+  const { theme, setTheme, username, setUsername, profilePicture, setProfilePicture } = useStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicture(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-black text-black dark:text-white transition-colors duration-300">
@@ -16,7 +28,43 @@ export function SettingsScreen({ onNavigate }: { onNavigate: (screen: ScreenType
         <div className="w-6"></div>
       </div>
       
-      <div className="p-6 flex flex-col gap-6">
+      <div className="p-6 flex flex-col gap-6 overflow-y-auto">
+         {/* Profile Edit */}
+         <div className="flex flex-col items-center mb-4">
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-dashed border-teal-500/50 flex items-center justify-center cursor-pointer hover:border-teal-400 transition-colors group bg-neutral-100 dark:bg-neutral-900 mb-4"
+            >
+              {profilePicture ? (
+                <>
+                  <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                    <ImagePlus className="w-6 h-6 text-white" />
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center text-teal-500/50 group-hover:text-teal-400 transition-colors">
+                  <ImagePlus className="w-6 h-6 mb-1" />
+                </div>
+              )}
+            </div>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+
+            <input 
+              type="text" 
+              placeholder="Username"
+              value={username || ''}
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-transparent border-b border-neutral-300 dark:border-neutral-700 text-center font-medium placeholder:text-neutral-500 focus:outline-none focus:border-teal-500 transition-colors px-2 py-1 w-full max-w-[200px]"
+            />
+         </div>
+
          <div>
             <h3 className="text-xs tracking-widest uppercase text-neutral-500 font-semibold mb-4 text-center">Appearance</h3>
             <div className="flex gap-4">

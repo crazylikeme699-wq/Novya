@@ -37,17 +37,31 @@ export interface Note {
   updatedAt: number;
 }
 
+export interface Alarm {
+  id: string;
+  time: string;
+  enabled: boolean;
+  label?: string;
+}
+
 export interface NovyaState {
   apps: AppIcon[];
   tasks: Task[];
   stats: UserStats;
   notes: Note[];
   focusSession: FocusSession;
+  alarms: Alarm[];
   profile: 'personal' | 'work';
   hasPermissions: boolean;
   theme: 'dark' | 'light';
+  username: string;
+  profilePicture: string | null;
+  hasCompletedSetup: boolean;
   setTheme: (theme: 'dark' | 'light') => void;
   setPermissions: (val: boolean) => void;
+  setUsername: (username: string) => void;
+  setProfilePicture: (pic: string | null) => void;
+  setHasCompletedSetup: (val: boolean) => void;
   addTask: (task: Omit<Task, 'id' | 'completed'>) => void;
   toggleTask: (id: string) => void;
   addXP: (amount: number) => void;
@@ -59,23 +73,23 @@ export interface NovyaState {
   deleteNote: (id: string) => void;
   setTasks: (tasks: Task[]) => void;
   deleteTask: (id: string) => void;
+  addAlarm: (time: string, label: string) => void;
+  toggleAlarm: (id: string) => void;
+  deleteAlarm: (id: string) => void;
 }
 
 const defaultApps: AppIcon[] = [
   { id: 'calendar', name: 'Calendar', icon: 'Calendar', bgColor: 'bg-red-500' },
   { id: 'notes', name: 'Notes', icon: 'FileText', bgColor: 'bg-yellow-500' },
+  { id: 'alarm', name: 'Alarms', icon: 'Clock', bgColor: 'bg-orange-500' },
   { id: 'settings', name: 'Settings', icon: 'Settings', bgColor: 'bg-gray-700', isSystem: true },
-  // "Distracting" apps for demonstration
-  { id: 'insta', name: 'Instagram', icon: 'Instagram', bgColor: 'bg-pink-600' },
-  { id: 'tiktok', name: 'TikTok', icon: 'Music', bgColor: 'bg-zinc-900' },
-  { id: 'fb', name: 'Facebook', icon: 'Facebook', bgColor: 'bg-blue-600' },
-  { id: 'youtube', name: 'YouTube', icon: 'Youtube', bgColor: 'bg-red-600' },
 ];
 
 export const useStore = create<NovyaState>()(
   persist(
     (set) => ({
       apps: defaultApps,
+      alarms: [],
       tasks: [],
       notes: [],
       stats: {
@@ -91,9 +105,15 @@ export const useStore = create<NovyaState>()(
       profile: 'personal',
       hasPermissions: false,
       theme: 'dark',
+      username: '',
+      profilePicture: null,
+      hasCompletedSetup: false,
 
       setTheme: (theme) => set({ theme }),
       setPermissions: (val) => set({ hasPermissions: val }),
+      setUsername: (username) => set({ username }),
+      setProfilePicture: (profilePicture) => set({ profilePicture }),
+      setHasCompletedSetup: (hasCompletedSetup) => set({ hasCompletedSetup }),
 
       addNote: (title, content) =>
         set((state) => ({
@@ -128,6 +148,26 @@ export const useStore = create<NovyaState>()(
       deleteTask: (id) =>
         set((state) => ({
           tasks: state.tasks.filter((task) => task.id !== id),
+        })),
+
+      addAlarm: (time, label) =>
+        set((state) => ({
+          alarms: [
+            ...state.alarms,
+            { id: Math.random().toString(36).substr(2, 9), time, label, enabled: true },
+          ],
+        })),
+
+      toggleAlarm: (id) =>
+        set((state) => ({
+          alarms: state.alarms.map((a) =>
+            a.id === id ? { ...a, enabled: !a.enabled } : a
+          ),
+        })),
+
+      deleteAlarm: (id) =>
+        set((state) => ({
+          alarms: state.alarms.filter((a) => a.id !== id),
         })),
 
       toggleTask: (id) =>

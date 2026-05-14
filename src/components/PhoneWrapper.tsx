@@ -8,11 +8,12 @@ import { AppDrawer } from './AppDrawer';
 import { SplashScreen } from './SplashScreen';
 import { NotesScreen } from './NotesScreen';
 import { SettingsScreen } from './SettingsScreen';
+import { AlarmScreen } from './AlarmScreen';
 import { Battery, Wifi, Signal } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store';
 
-export type ScreenType = 'splash' | 'launcher' | 'drawer' | 'coach' | 'planner' | 'focus' | 'progress' | 'notes' | 'settings';
+export type ScreenType = 'splash' | 'launcher' | 'drawer' | 'coach' | 'planner' | 'focus' | 'progress' | 'notes' | 'settings' | 'alarm';
 
 export function PhoneWrapper() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('splash');
@@ -87,6 +88,11 @@ export function PhoneWrapper() {
           {currentScreen === 'settings' && (
              <motion.div key="settings" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="h-full bg-white dark:bg-black">
                <SettingsScreen onNavigate={setCurrentScreen} />
+             </motion.div>
+          )}
+          {currentScreen === 'alarm' && (
+             <motion.div key="alarm" initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="h-full bg-white dark:bg-black">
+               <AlarmScreen onNavigate={setCurrentScreen} />
              </motion.div>
           )}
         </AnimatePresence>

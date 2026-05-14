@@ -3,20 +3,49 @@ import { useStore } from '../store';
 import { ScreenType } from './PhoneWrapper';
 import { format } from 'date-fns';
 import { motion } from 'motion/react';
-import { Brain, CalendarCheck, Focus, Settings2, Sparkles, ChevronUp, CheckCircle2, Circle } from 'lucide-react';
+import { Brain, CalendarCheck, Settings2, Sparkles, ChevronUp, CheckCircle2, Circle, Sun, Moon, Clock, TrendingUp, FileText } from 'lucide-react';
 
 export function Launcher({ onNavigate }: { onNavigate: (screen: ScreenType) => void }) {
   const tasks = useStore((state) => state.tasks);
   const toggleTask = useStore((state) => state.toggleTask);
   const stats = useStore((state) => state.stats);
   const focusSession = useStore((state) => state.focusSession);
+  const profilePicture = useStore((state) => state.profilePicture);
+  const username = useStore((state) => state.username);
+  const { theme, setTheme } = useStore();
 
   const pendingHabits = tasks.filter(t => !t.completed).slice(0, 3);
   const completedToday = tasks.filter(t => t.completed).length;
 
   return (
-    <div className="flex flex-col h-full items-center px-6 pt-12 pb-8 text-neutral-800 dark:text-neutral-200 transition-colors duration-300">
+    <div className="flex flex-col h-full items-center px-6 pt-8 pb-8 text-neutral-800 dark:text-neutral-200 transition-colors duration-300 relative">
       
+      {/* Profile in top left */}
+      <div className="absolute top-4 left-6 pt-2">
+        <button 
+          onClick={() => onNavigate('settings')}
+          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+        >
+          {profilePicture ? (
+             <img src={profilePicture} className="w-10 h-10 rounded-full object-cover border border-neutral-200 dark:border-neutral-800" alt="profile"/>
+          ) : (
+             <div className="w-10 h-10 rounded-full bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
+                <span className="font-medium text-neutral-500 uppercase">{username?.charAt(0) || '?'}</span>
+             </div>
+          )}
+        </button>
+      </div>
+
+      {/* Settings / Theme Toggle in top right */}
+      <div className="absolute top-4 right-6 pt-2">
+        <button 
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-800 transition-colors text-neutral-600 dark:text-neutral-400"
+        >
+           {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+      </div>
+
       {/* Time & Date */}
       <div className="mt-12 text-center w-full flex flex-col items-center">
         <h1 className="text-6xl font-light tracking-tighter text-black dark:text-white transition-colors duration-300">
@@ -46,19 +75,19 @@ export function Launcher({ onNavigate }: { onNavigate: (screen: ScreenType) => v
             <CalendarCheck className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors" />
             <span className="text-lg font-medium tracking-wide">Plan Day</span>
           </button>
-          
-          <button onClick={() => onNavigate('coach')} className="flex items-center gap-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors group">
-            <Brain className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors" />
-            <span className="text-lg font-medium tracking-wide">AI Coach</span>
+
+          <button onClick={() => onNavigate('alarm')} className="flex items-center gap-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors group">
+            <Clock className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-orange-500 dark:group-hover:text-orange-400 transition-colors" />
+            <span className="text-lg font-medium tracking-wide">Alarms</span>
           </button>
 
-          <button onClick={() => onNavigate('focus')} className="flex items-center gap-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors group">
-            <Focus className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-rose-500 dark:group-hover:text-rose-400 transition-colors" />
-            <span className="text-lg font-medium tracking-wide">Deep Focus</span>
+          <button onClick={() => onNavigate('notes')} className="flex items-center gap-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors group">
+             <FileText className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-yellow-500 dark:group-hover:text-yellow-400 transition-colors" />
+             <span className="text-lg font-medium tracking-wide">Notes</span>
           </button>
 
           <button onClick={() => onNavigate('progress')} className="flex items-center gap-4 text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors group">
-            <Settings2 className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" />
+            <TrendingUp className="w-5 h-5 text-neutral-400 dark:text-neutral-600 group-hover:text-indigo-500 dark:group-hover:text-indigo-400 transition-colors" />
             <span className="text-lg font-medium tracking-wide">Progress</span>
           </button>
 

@@ -47,27 +47,33 @@ export function AICoach({ onNavigate }: { onNavigate: (screen: ScreenType) => vo
         parts: [{ text: m.content }]
       }));
 
-      const systemPrompt = `You are Novya, a strict, direct AI productivity coach. 
-      CRITICAL RULES:
-      1. NEVER use greetings (e.g., "Hello", "Hi", "Namaste", "Hey"). Start immediately with your point.
-      2. NEVER repeat previous advice or be generic.
-      3. Keep answers extremely short and punchy (max 2 sentences).
-      4. Provide fast, highly actionable advice strictly related to overcoming procrastination and completing tasks.
-      5. IMPORTANT: Always respond in the exact same language the user writes in (e.g., if Hindi, reply in Hindi, if English, reply in English).
-      6. User's task completion status: ${allCompleted ? "ALL TASKS COMPLETED" : "TASKS PENDING"}. If all tasks are completed, intensely motivate and praise the user for their discipline.`;
+      const systemPrompt = `You are an AI Coach, a highly motivating, friendly, and intelligent assistant acting like ChatGPT or Gemini. 
+      RULES:
+      1. Be deeply conversational, empathetic, and highly motivating.
+      2. Respond in whatever language the user speaks to you in natively and fluently.
+      3. Do not just say "cheers" or be repetitive—offer actual, thoughtful advice or insight to help them succeed.
+      4. Encourage them and act as their absolute best cheerleader while providing practical productivity advice.
+      5. User's task completion status: ${allCompleted ? "ALL TASKS COMPLETED" : "TASKS PENDING"}. If tasks are completed, celebrate their success meaningfully!
+      6. CRITICAL: Keep your responses extremely short. No more than 1 or 2 small sentences. Be very punchy and direct, while still being extremely friendly.`;
 
+      // Filter to ensure correct alternation or just let history pass as is. 
+      // If the first message in the sliced history is 'model', and we prepend it, it should alternate with the new 'user' message.
+      // But we can simplify by just using systemInstruction.
+      let validHistory = [...history];
+      if (validHistory.length > 0 && validHistory[0].role === 'model') {
+        validHistory = [{ role: 'user', parts: [{ text: "Hello" }] }, ...validHistory];
+      }
+      
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
         contents: [
-          { role: 'user', parts: [{ text: systemPrompt }] },
-          { role: 'model', parts: [{ text: "Understood." }] },
-          // Convert history to match GenAI SDK
-          ...history.slice(-4),
+          ...validHistory,
           { role: 'user', parts: [{ text: userMsg }] }
         ],
         config: {
+          systemInstruction: systemPrompt,
           temperature: 0.7,
-          maxOutputTokens: 100,
+          maxOutputTokens: 150,
         }
       });
 
